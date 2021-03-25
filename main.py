@@ -22,6 +22,12 @@ FoodImg = pygame.transform.scale(pygame.image.load('images/food.png'), (32,32))
 Food_X = random.randint(50, 750)
 Food_Y = random.randint(50, 550)
 
+
+Bonus = pygame.transform.scale(pygame.image.load('images/bonus.png'), (32,32))
+Bonus_X = 0
+Bonus_Y = 0
+
+
 Snake_Body_X=[]
 Snake_Body_Y=[]
 Position_x = []
@@ -55,18 +61,32 @@ def snake_body():
 
 
 
-def food(x,y):
+def food(x,y,x1, y1):
     screen.blit(FoodImg,(x,y))
+    if score_value%100 == 0 and not(score_value == 0):
+        screen.blit(Bonus,(x1,y1))
 
 
 
-def Eat(x1, y1, x2, y2):
+def Eat(x1, y1, x2, y2, x3 ,y3):
     distance = math.sqrt(math.pow(x1 - x2, 2) + (math.pow(y1 - y2, 2)))
+    distance1 =  math.sqrt(math.pow(x1 - x3, 2) + (math.pow(y1 - y3, 2)))
     if distance < 20:
-        return True
+        return True, False
         
+    
+    
+    if score_value%100 == 0 and not(score_value == 0):
+        if distance1 < 20:
+            
+            return True, True
+            
+        else:
+            return False , True
+    
     else:
-        return False
+        return False , False
+
 
 def body_collision():
      x1 = Snake_Body_X[0]
@@ -129,11 +149,26 @@ while runtime :
     snake_Y += snake_Y_Change
 
 
-    if Eat(snake_X, snake_Y, Food_X, Food_Y) :
+    food_eat , bonus_eat = Eat(snake_X, snake_Y, Food_X, Food_Y, Bonus_X, Bonus_Y)
+
+
+    if food_eat :
         
         Food_X = random.randint(50, 750)
         Food_Y = random.randint(50, 550)
-        score_value+=10
+
+        Bonus_X = random.randint(50, 750)
+        Bonus_Y = random.randint(50, 550)
+        if bonus_eat :
+            score_value+=20
+            Snake_Body_X.pop()
+            Snake_Body_X.pop()
+            Snake_Body_X.pop()
+            Snake_Body_Y.pop()
+            Snake_Body_Y.pop()
+            Snake_Body_Y.pop()
+        else :
+            score_value += 10
         
         l= len(Position_x)
         Snake_Body_X.append(Position_x[l-5])
@@ -159,7 +194,7 @@ while runtime :
             if(snake_X_Change != 0 or snake_Y_Change !=0):
                 snake_body()
         
-            food(Food_X, Food_Y)
+            food(Food_X, Food_Y, Bonus_X, Bonus_Y)
             show_score(10,10)
         
     else :
@@ -167,7 +202,7 @@ while runtime :
         if(snake_X_Change != 0 or snake_Y_Change !=0):
             snake_body()
         
-        food(Food_X, Food_Y)
+        food(Food_X, Food_Y, Bonus_X,Bonus_Y)
         show_score(10,10)
 
     if c==70 :
