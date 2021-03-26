@@ -33,12 +33,29 @@ Snake_Body_Y=[]
 Position_x = []
 Position_y = []
 
+Start = False
 
 
 score_value=0
 font = pygame.font.Font('freesansbold.ttf', 32)
+font_inst = pygame.font.Font('freesansbold.ttf', 18)
 
 over_font = pygame.font.Font('freesansbold.ttf', 64)
+
+Intro = pygame.font.Font('freesansbold.ttf', 74)
+
+
+def Menu() :
+    main_intro = Intro.render("Snake Game", True, (0,0,0))
+    screen.blit(main_intro, (180, 10))
+    screen.blit(FoodImg, (30, 200))
+    screen.blit(Bonus,(30, 250))
+    food_inst = font_inst.render(": Eat food for 10 Points and body will grow by one unit", True, (0,0,0))
+    bonus_inst = font_inst.render(": Eat Bonus(will appear in between) for 20 Points and body will decrease by 3 units", True, (0,0,0))
+    inst = font.render("Press [SPACE] to Start", True, (0,0,0))
+    screen.blit(food_inst, (80, 200))
+    screen.blit(bonus_inst, (80, 250))
+    screen.blit(inst, (200,400))
 
 def snake(x,y):
     
@@ -117,7 +134,7 @@ runtime= True
 End=False
 c=0
 while runtime :
-    c=c+1
+    
     screen.blit(background, (0, 0))
     for event in pygame.event.get() :
         if event.type == pygame.QUIT :
@@ -135,81 +152,90 @@ while runtime :
             if event.key == pygame.K_DOWN :
                 snake_Y_Change = s
                 snake_X_Change =0
-
-    if snake_X <= 0:
-        snake_X = 0
-    elif snake_X >= 736:
-        snake_X = 736
-    if snake_Y <= 0:
-        snake_Y = 0
-    elif snake_Y>= 536:
-        snake_Y= 536
+            if event.key == pygame.K_SPACE :
+                Start = True
     
-    snake_X += snake_X_Change
-    snake_Y += snake_Y_Change
+    
+    if(Start == True):
+        c=c+1
 
-
-    food_eat , bonus_eat = Eat(snake_X, snake_Y, Food_X, Food_Y, Bonus_X, Bonus_Y)
-
-
-    if food_eat :
+        if snake_X <= 0:
+            snake_X = 0
+        elif snake_X >= 736:
+            snake_X = 736
+        if snake_Y <= 0:
+            snake_Y = 0
+        elif snake_Y>= 536:
+            snake_Y= 536
         
-        Food_X = random.randint(50, 750)
-        Food_Y = random.randint(50, 550)
+        snake_X += snake_X_Change
+        snake_Y += snake_Y_Change
 
-        Bonus_X = random.randint(50, 750)
-        Bonus_Y = random.randint(50, 550)
-        if bonus_eat :
-            score_value+=20
-            Snake_Body_X.pop()
-            Snake_Body_X.pop()
-            Snake_Body_X.pop()
-            Snake_Body_Y.pop()
-            Snake_Body_Y.pop()
-            Snake_Body_Y.pop()
+
+        food_eat , bonus_eat = Eat(snake_X, snake_Y, Food_X, Food_Y, Bonus_X, Bonus_Y)
+
+
+        if food_eat :
+            
+            Food_X = random.randint(50, 750)
+            Food_Y = random.randint(50, 550)
+
+            Bonus_X = random.randint(50, 750)
+            Bonus_Y = random.randint(50, 550)
+            if bonus_eat :
+                score_value+=20
+                Snake_Body_X.pop()
+                Snake_Body_X.pop()
+                Snake_Body_X.pop()
+                Snake_Body_Y.pop()
+                Snake_Body_Y.pop()
+                Snake_Body_Y.pop()
+            else :
+                score_value += 10
+            
+            l= len(Position_x)
+            Snake_Body_X.append(Position_x[l-5])
+            Snake_Body_Y.append(Position_y[l-5])
+            
+
+
+
+
+
+        if(len(Snake_Body_Y) >1):
+            
+            if(body_collision()):
+                game_over(200,180)
+                End = True
+            
+            elif( End):
+                game_over(200,180)
+
+            
+            else:
+                snake(snake_X, snake_Y)
+                if(snake_X_Change != 0 or snake_Y_Change !=0):
+                    snake_body()
+            
+                food(Food_X, Food_Y, Bonus_X, Bonus_Y)
+                show_score(10,10)
+            
         else :
-            score_value += 10
-        
-        l= len(Position_x)
-        Snake_Body_X.append(Position_x[l-5])
-        Snake_Body_Y.append(Position_y[l-5])
-        
-
-
-
-
-
-    if(len(Snake_Body_Y) >1):
-        
-        if(body_collision()):
-            game_over(200,180)
-            End = True
-        
-        elif( End):
-            game_over(200,180)
-
-        
-        else:
             snake(snake_X, snake_Y)
             if(snake_X_Change != 0 or snake_Y_Change !=0):
                 snake_body()
-        
-            food(Food_X, Food_Y, Bonus_X, Bonus_Y)
+            
+            food(Food_X, Food_Y, Bonus_X,Bonus_Y)
             show_score(10,10)
-        
-    else :
-        snake(snake_X, snake_Y)
-        if(snake_X_Change != 0 or snake_Y_Change !=0):
-            snake_body()
-        
-        food(Food_X, Food_Y, Bonus_X,Bonus_Y)
-        show_score(10,10)
 
-    if c==70 :
-        Position_x.append(snake_X)
-        Position_y.append(snake_Y)
-        
-        c=0
+        if c==70 :
+            Position_x.append(snake_X)
+            Position_y.append(snake_Y)
+            
+            c=0
+    
+    else:
+        Menu()
 
 
 
